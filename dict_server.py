@@ -131,7 +131,7 @@ def query(c, data, db):
     word = l[1]
     name = l[2]
 
-    #查询用户表
+    #查询单词表
     cursor = db.cursor()
     sql = \
     "select * from words where word='%s'"%word
@@ -161,7 +161,7 @@ def history(c, data, db):
     l = data.split(" ")
     name = l[1]
 
-    #查询用户表
+    #查询历史记录表
     cursor = db.cursor()
     sql = \
     "select * from hist where name='%s'" % name
