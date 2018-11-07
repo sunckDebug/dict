@@ -2,14 +2,15 @@
 #coding=utf-8
 
 '''
-name : zhang
-date : 2018-09-28
+name : zhanghaohao
+date : 2018-10-8
 email : 1741126544@qq.com
 modules: python3.5  mysql  pymysql
 This is a dict project for AID
 '''
 
 from socket import *
+from threading import Thread
 import os,pymysql,time,sys,signal
 
 DICT = "./dict.txt"
@@ -20,7 +21,7 @@ ADDR = (HOST, POST)
 def main():
     #创建数据库链接
     db = pymysql.connect\
-    ('localhost','root','123456','dict')
+    ('localhost','root','root','dict')
 
     #创建流式套接字
     s = socket()
@@ -40,18 +41,23 @@ def main():
             continue
 
 
-        #创建子进程
-        p = os.fork()
-        if p == 0:
-            s.close()
-            do_child(c, db)
-            sys.exit(0)
-        else:
-            c.close()
-            continue
+        # #创建子进程
+        # p = os.fork()
+        # if p == 0:
+        #     s.close()
+        #     do_child(c, db)
+        #     sys.exit(0)
+        # else:
+        #     c.close()
+        #     continue
+
+        # 创建进程池
+        handle_client = Thread(target = do_child,args = (c, db))
+        handle_client.setDaemon(True)
+        handle_client.start()    
     
 
-
+#业务分离模块
 def do_child(c, db):
     while True:
         data = c.recv(128).decode()
@@ -69,18 +75,19 @@ def do_child(c, db):
             history(c, data, db)
 
 
-
+#登录模块
 def login(c, data, db):
     l = data.split(" ")
 
     name = l[1]
+    print(type(name))
     passwd = l[2]
 
 
     #查询用户表
     cursor = db.cursor()
     sql = \
-    "select * from user where name='%s'"%name
+    "select * from user where name='%s';" % name
     cursor.execute(sql)
     r = cursor.fetchone()
 
@@ -91,7 +98,7 @@ def login(c, data, db):
 
 
 
-
+#注册模块
 def register(c, data, db):
     l = data.split(" ")
 
@@ -124,7 +131,7 @@ def register(c, data, db):
 
 
 
-
+#查单词模块
 def query(c, data, db):
     l = data.split(" ")
 
@@ -156,7 +163,7 @@ def query(c, data, db):
     insert_history()
     c.send(r[2].encode())
 
-
+#历史查询模块
 def history(c, data, db):
     l = data.split(" ")
     name = l[1]

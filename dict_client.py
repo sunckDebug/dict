@@ -163,7 +163,7 @@ def history(s):
 
 
     n = 0
-    x = PrettyTable(["<<$ID$>>","<<$name$>>","<<$word$>>","<<$date$>>"])
+    x = PrettyTable(["<<$ ID $>>","<<$ name $>>","<<$ word $>>","<<$ date $>>"])
     while True:
         x.add_row([data[1+n],data[2+n],data[3+n],data[4+n]])
         n += 4
